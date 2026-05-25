@@ -11,7 +11,7 @@ class MetaTuple(type):
             setattr(cls, fld, property(itemgetter(n)))
 
 
-class Tuple(tuple):
+class Tuple(tuple, metaclass=MetaTuple):
     def __new__(cls, *args):
         na = len(cls._fields)
         if na != len(args):
