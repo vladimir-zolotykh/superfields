@@ -46,6 +46,10 @@ class MultiMethod:
             parm.annotation for name, parm in sig.parameters.items() if name != "self"
         ]
         self.methods[tuple(_types)] = func
+        n = sum((v.default is not inspect._empty) for v in sig.parameters.values())
+        if 0 < n:
+            _types = _types[:-n]
+            self.methods[tuple(_types)] = func
 
 
 class MultiMeta(type):
@@ -72,5 +76,5 @@ if __name__ == "__main__":
     c = Calc()
     print(c.compute(10, 20))
     print(c.compute(3.5, 6.7))
-    # c.compute(3.6)
+    print(c.compute(3.6))
     print(c.compute("Hello, ", "World!"))
