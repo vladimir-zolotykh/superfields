@@ -42,14 +42,17 @@ class MultiMethod:
 
     def register(self, func: Callable):
         sig = inspect.signature(func)
-        _types = [
-            parm.annotation for name, parm in sig.parameters.items() if name != "self"
-        ]
-        self.methods[tuple(_types)] = func
-        n = sum((v.default is not inspect._empty) for v in sig.parameters.values())
-        if 0 < n:
-            _types = _types[:-n]
-            self.methods[tuple(_types)] = func
+        _types: list[type] = []
+        num_defaults: int = 0
+        for name, parm in sig.parameters.items():
+            if name == "self":
+                continue
+            _types.append(parm.annotation)
+            num_defaults += parm.default is not inspect._empty
+        key = tuple(_types)
+        self.methods[key] = func
+        if 0 < num_defaults:
+            self.methods[key[:-num_defaults]] = func
 
 
 class MultiMeta(type):
